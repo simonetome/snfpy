@@ -9,7 +9,7 @@ from scipy.spatial.distance import cdist
 from scipy import sparse, stats
 from sklearn.utils.validation import (check_array, check_symmetric,
                                       check_consistent_length)
-
+from gower import gower_matrix
 
 def _flatten(messy):
     """
@@ -71,7 +71,7 @@ def _check_data_metric(data, metric):
             yield check_array(d, force_all_finite=False), m
 
 
-def make_affinity(*data, metric='sqeuclidean', K=20, mu=0.5, normalize=True):
+def make_affinity(*data, metric='sqeuclidean', K=20, mu=0.5, normalize=True, cat_features = None):
     r"""
     Constructs affinity (i.e., similarity) matrix from `data`
 
@@ -156,7 +156,15 @@ def make_affinity(*data, metric='sqeuclidean', K=20, mu=0.5, normalize=True):
             zarr = inp
 
         # construct distance matrix using `metric` and make affinity matrix
-        distance = cdist(zarr, zarr, metric=met)
+
+        # modified by @simonetome:
+        #
+        # if metric is "gower" -> use gower_matrix from gower library 
+        #
+        if metric == "gower":
+            distance = gower_matrix(zarr, cat_features)
+        else:
+            distance = cdist(zarr, zarr, metric=met)
         affinity += [affinity_matrix(distance, K=K, mu=mu)]
 
     # match input type (if only one array provided, return array not list)
