@@ -162,7 +162,7 @@ def make_affinity(*data, metric='sqeuclidean', K=20, mu=0.5, normalize=True, cat
         # if metric is "gower" -> use gower_matrix from gower library 
         #
         if metric == "gower":
-            distance = gower_matrix(zarr, cat_features)
+            distance = gower_matrix(zarr, cat_features=cat_features)
         else:
             distance = cdist(zarr, zarr, metric=met)
         affinity += [affinity_matrix(distance, K=K, mu=mu)]
